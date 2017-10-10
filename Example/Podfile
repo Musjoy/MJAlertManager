@@ -1,0 +1,6 @@
+use_frameworks!
+target 'MJAlertManager_Tests' do
+  pod 'MJAlertManager', :path => '../'
+  
+  
+end
