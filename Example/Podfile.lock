@@ -1,0 +1,19 @@
+PODS:
+  - MJAlertManager (0.1.0):
+    - ModuleCapability
+  - ModuleCapability (0.1.3)
+
+DEPENDENCIES:
+  - MJAlertManager (from `../`)
+
+EXTERNAL SOURCES:
+  MJAlertManager:
+    :path: ../
+
+SPEC CHECKSUMS:
+  MJAlertManager: f77b4685864e981bce819d0d6efa6235103f727b
+  ModuleCapability: ddbdca2e27961555130a880b66fd9816172a4993
+
+PODFILE CHECKSUM: e08665c91944252aad532afb0deae3c59c221a1d
+
+COCOAPODS: 1.3.1
