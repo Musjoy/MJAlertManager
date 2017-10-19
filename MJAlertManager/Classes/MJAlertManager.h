@@ -15,6 +15,10 @@
 /// 代码点击一个Alert来销毁它
 + (void)clickAlert:(UIAlertController *)alertController atIndex:(NSInteger)buttonIndex;
 
++ (void)refreshAlert:(UIAlertController *)alertController title:(NSString *)title message:(NSString *)message;
+
+#pragma mark - Alert
+
 /// 显示一个普通弹框，包括本地化的确定按钮
 + (UIAlertController *)showAlertWithTitle:(NSString *)title message:(NSString *)message;
 

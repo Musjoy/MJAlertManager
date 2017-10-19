@@ -91,9 +91,9 @@ static BOOL s_alertWindowInShow = NO;
     
 }
 
-+ (void)dismissAlertController:(UIAlertController *)alertVC
++ (void)dismissAlertController:(UIAlertController *)alertVC completion:(void (^)(void))completion
 {
-    [alertVC dismissViewControllerAnimated:YES completion:NULL];
+    [alertVC dismissViewControllerAnimated:NO completion:completion];
 }
 
 + (void)alertControllerBeenDismissed:(UIAlertController *)alertVC
@@ -136,7 +136,11 @@ static BOOL s_alertWindowInShow = NO;
     }
     UIViewController *rootVC = [[self alertWindow] rootViewController];
     if (rootVC.presentedViewController == alertController) {
-        [self dismissAlertController:alertController];
+        [self dismissAlertController:alertController completion:^{
+            // 这里这样处理是为了执行后面的代码
+            [self clickAlert:alertController atIndex:buttonIndex];
+        }];
+        return;
     }
     if (alertController.actions.count == 0) {
         [self alertControllerBeenDismissed:alertController];
@@ -169,6 +173,13 @@ static BOOL s_alertWindowInShow = NO;
         }
     }
     [self alertControllerBeenDismissed:alertController];
+}
+
+
++ (void)refreshAlert:(UIAlertController *)alertController title:(NSString *)title message:(NSString *)message
+{
+    alertController.title = title;
+    alertController.message = message;
 }
 
 
