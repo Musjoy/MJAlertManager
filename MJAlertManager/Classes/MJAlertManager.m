@@ -197,6 +197,10 @@ static BOOL s_alertWindowInShow = NO;
 
 + (UIAlertController *)showAlertWithTitle:(NSString *)title message:(NSString *)message cancel:(NSString *)cancel confirm:(NSString *)confirm completion:(void (^)(NSInteger))completion
 {
+    if (confirm == nil && cancel == nil) {
+        // 确保必须有按钮
+        confirm = locString(@"OK");
+    }
     return [self showAlertWithTitle:title message:message cancel:cancel confirm:confirm destroy:nil otherButtons:nil completion:completion];
 }
 
@@ -211,10 +215,18 @@ static BOOL s_alertWindowInShow = NO;
 #endif
     NSString *title = [self displayStringFor:@"title" with:alertInfo];
     NSString *message = [self displayStringFor:@"message" with:alertInfo];
+    if (message == nil) {
+        // 为了兼容部分模块，后续再考虑是否删除
+        message = [self displayStringFor:@"content" with:alertInfo];
+    }
     NSString *cancel = [self displayStringFor:@"cancel" with:alertInfo];
     NSString *confirm = [self displayStringFor:@"confirm" with:alertInfo];
     NSString *destroy = [self displayStringFor:@"destroy" with:alertInfo];
     NSArray *arrBtns = alertInfo[@"btns"];
+    if (confirm == nil && cancel == nil && destroy == nil && arrBtns == nil) {
+        // 确保必须有按钮
+        confirm = locString(@"OK");
+    }
     
 #ifdef MODULE_LOCALIZE
     [[MJLocalize sharedInstance] removeLocalizedWith:tableId];
@@ -248,6 +260,10 @@ static BOOL s_alertWindowInShow = NO;
 
 + (UIAlertController *)showActionSheetWithTitle:(NSString *)title message:(NSString *)message cancel:(NSString *)cancel confirm:(NSString *)confirm completion:(void (^)(NSInteger))completion
 {
+    if (confirm == nil && cancel == nil) {
+        // 确保必须有按钮
+        confirm = locString(@"OK");
+    }
     return [self showActionSheetWithTitle:title message:message cancel:cancel confirm:confirm destroy:nil otherButtons:nil completion:completion];
 }
 
@@ -262,10 +278,18 @@ static BOOL s_alertWindowInShow = NO;
 #endif
     NSString *title = [self displayStringFor:@"title" with:alertInfo];
     NSString *message = [self displayStringFor:@"message" with:alertInfo];
+    if (message == nil) {
+        // 为了兼容部分模块，后续再考虑是否删除
+        message = [self displayStringFor:@"content" with:alertInfo];
+    }
     NSString *cancel = [self displayStringFor:@"cancel" with:alertInfo];
     NSString *confirm = [self displayStringFor:@"confirm" with:alertInfo];
     NSString *destroy = [self displayStringFor:@"destroy" with:alertInfo];
     NSArray *arrBtns = alertInfo[@"btns"];
+    if (confirm == nil && cancel == nil && destroy == nil && arrBtns == nil) {
+        // 确保必须有按钮
+        confirm = locString(@"OK");
+    }
     
 #ifdef MODULE_LOCALIZE
     [[MJLocalize sharedInstance] removeLocalizedWith:tableId];
@@ -284,6 +308,10 @@ static BOOL s_alertWindowInShow = NO;
 
 + (UIAlertController *)showAlertWithTitle:(NSString *)title message:(NSString *)message cancel:(NSString *)cancel confirm:(NSString *)confirm destroy:(NSString *)destroy otherButtons:(NSArray *)arrBtns style:(UIAlertControllerStyle)style completion:(void (^)(NSInteger))completion
 {
+    if (title == nil && message == nil) {
+        LogError(@"Nothing to show")
+        return nil;
+    }
     UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:style];
     
     void (^alertClick)(NSInteger ) = ^(NSInteger selectIndex) {
