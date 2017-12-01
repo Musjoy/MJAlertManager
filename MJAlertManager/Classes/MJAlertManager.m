@@ -309,7 +309,7 @@ static BOOL s_alertWindowInShow = NO;
 + (UIAlertController *)showAlertWithTitle:(NSString *)title message:(NSString *)message cancel:(NSString *)cancel confirm:(NSString *)confirm destroy:(NSString *)destroy otherButtons:(NSArray *)arrBtns style:(UIAlertControllerStyle)style completion:(void (^)(NSInteger))completion
 {
     if (title == nil && message == nil) {
-        LogError(@"Nothing to show")
+        LogError(@"Nothing to show");
         return nil;
     }
     UIAlertController *alertVC = [UIAlertController alertControllerWithTitle:title message:message preferredStyle:style];
