@@ -286,7 +286,7 @@ static BOOL s_alertWindowInShow = NO;
     NSString *confirm = [self displayStringFor:@"confirm" with:alertInfo];
     NSString *destroy = [self displayStringFor:@"destroy" with:alertInfo];
     NSArray *arrBtns = alertInfo[@"btns"];
-    if (confirm == nil && cancel == nil && destroy == nil && arrBtns == nil) {
+    if (confirm.length == 0 && cancel.length == 0 && destroy.length == 0 && [arrBtns count] == 0) {
         // 确保必须有按钮
         confirm = locString(@"OK");
     }
