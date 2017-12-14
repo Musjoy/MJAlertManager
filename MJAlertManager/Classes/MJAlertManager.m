@@ -206,33 +206,7 @@ static BOOL s_alertWindowInShow = NO;
 
 + (UIAlertController *)showAlertWith:(NSDictionary *)alertInfo completion:(void (^)(NSInteger selectIndex))completion
 {
-#ifdef MODULE_LOCALIZE
-    NSDictionary *dicLocalize = [alertInfo objectForKey:kLocalizable];
-    NSString *tableId = nil;
-    if (dicLocalize) {
-        tableId = [self addThisLocalize:dicLocalize withAlertInfo:alertInfo];
-    }
-#endif
-    NSString *title = [self displayStringFor:@"title" with:alertInfo];
-    NSString *message = [self displayStringFor:@"message" with:alertInfo];
-    if (message == nil) {
-        // 为了兼容部分模块，后续再考虑是否删除
-        message = [self displayStringFor:@"content" with:alertInfo];
-    }
-    NSString *cancel = [self displayStringFor:@"cancel" with:alertInfo];
-    NSString *confirm = [self displayStringFor:@"confirm" with:alertInfo];
-    NSString *destroy = [self displayStringFor:@"destroy" with:alertInfo];
-    NSArray *arrBtns = alertInfo[@"btns"];
-    if (confirm == nil && cancel == nil && destroy == nil && arrBtns == nil) {
-        // 确保必须有按钮
-        confirm = locString(@"OK");
-    }
-    
-#ifdef MODULE_LOCALIZE
-    [[MJLocalize sharedInstance] removeLocalizedWith:tableId];
-#endif
-    
-    return [self showAlertWithTitle:title message:message cancel:cancel confirm:confirm destroy:destroy otherButtons:arrBtns completion:completion];
+    return [self showAlertWithInfo:alertInfo style:UIAlertControllerStyleAlert completion:completion];
 }
 
 + (UIAlertController *)showAlertWithTitle:(NSString *)title message:(NSString *)message cancel:(NSString *)cancel confirm:(NSString *)confirm destroy:(NSString *)destroy otherButtons:(NSArray *)arrBtns completion:(void (^)(NSInteger))completion
@@ -269,6 +243,19 @@ static BOOL s_alertWindowInShow = NO;
 
 + (UIAlertController *)showActionSheetWith:(NSDictionary *)alertInfo completion:(void (^)(NSInteger selectIndex))completion
 {
+    return [self showAlertWithInfo:alertInfo style:UIAlertControllerStyleActionSheet completion:completion];
+}
+
++ (UIAlertController *)showActionSheetWithTitle:(NSString *)title message:(NSString *)message cancel:(NSString *)cancel confirm:(NSString *)confirm destroy:(NSString *)destroy otherButtons:(NSArray *)arrBtns completion:(void (^)(NSInteger))completion
+{
+    return [self showAlertWithTitle:title message:message cancel:cancel confirm:confirm destroy:destroy otherButtons:arrBtns style:UIAlertControllerStyleActionSheet completion:completion];
+}
+
+
+#pragma mark - Private
+
++ (UIAlertController *)showAlertWithInfo:(NSDictionary *)alertInfo style:(UIAlertControllerStyle)style completion:(void (^)(NSInteger))completion
+{
 #ifdef MODULE_LOCALIZE
     NSDictionary *dicLocalize = [alertInfo objectForKey:kLocalizable];
     NSString *tableId = nil;
@@ -294,21 +281,12 @@ static BOOL s_alertWindowInShow = NO;
 #ifdef MODULE_LOCALIZE
     [[MJLocalize sharedInstance] removeLocalizedWith:tableId];
 #endif
-    
-    return [self showActionSheetWithTitle:title message:message cancel:cancel confirm:confirm destroy:destroy otherButtons:arrBtns completion:completion];
+    return [self showAlertWithTitle:title message:message cancel:cancel confirm:confirm destroy:destroy otherButtons:arrBtns style:style completion:completion];
 }
-
-+ (UIAlertController *)showActionSheetWithTitle:(NSString *)title message:(NSString *)message cancel:(NSString *)cancel confirm:(NSString *)confirm destroy:(NSString *)destroy otherButtons:(NSArray *)arrBtns completion:(void (^)(NSInteger))completion
-{
-    return [self showAlertWithTitle:title message:message cancel:cancel confirm:confirm destroy:destroy otherButtons:arrBtns style:UIAlertControllerStyleActionSheet completion:completion];
-}
-
-
-#pragma mark - Private
 
 + (UIAlertController *)showAlertWithTitle:(NSString *)title message:(NSString *)message cancel:(NSString *)cancel confirm:(NSString *)confirm destroy:(NSString *)destroy otherButtons:(NSArray *)arrBtns style:(UIAlertControllerStyle)style completion:(void (^)(NSInteger))completion
 {
-    if (title == nil && message == nil) {
+    if (title.length == 0 && message.length == 0) {
         LogError(@"Nothing to show");
         return nil;
     }
