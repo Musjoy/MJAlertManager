@@ -221,34 +221,75 @@ static BOOL s_alertWindowInShow = NO;
 
 #pragma mark - ActionSheet
 
-
-+ (UIAlertController *)showActionSheetWithTitle:(NSString *)title message:(NSString *)message
++ (UIAlertController *)showActionSheetWithTitle:(NSString *)title cancel:(NSString *)cancel confirm:(NSString *)confirm completion:(void (^)(NSInteger))completion
 {
-    return [self showActionSheetWithTitle:title message:message cancel:nil confirm:locString(@"OK") completion:NULL];
+    return [self showActionSheetWithTitle:title cancel:cancel confirm:confirm onView:nil completion:completion];
 }
 
-+ (UIAlertController *)showActionSheetWithTitle:(NSString *)title message:(NSString *)message completion:(void (^)(NSInteger))completion
-{
-    return [self showActionSheetWithTitle:title message:message cancel:nil confirm:locString(@"OK") completion:completion];
-}
-
-+ (UIAlertController *)showActionSheetWithTitle:(NSString *)title message:(NSString *)message cancel:(NSString *)cancel confirm:(NSString *)confirm completion:(void (^)(NSInteger))completion
++ (UIAlertController *)showActionSheetWithTitle:(NSString *)title cancel:(NSString *)cancel confirm:(NSString *)confirm onView:(UIView *)aView completion:(void (^)(NSInteger))completion
 {
     if (confirm == nil && cancel == nil) {
         // 确保必须有按钮
         confirm = locString(@"OK");
     }
-    return [self showActionSheetWithTitle:title message:message cancel:cancel confirm:confirm destroy:nil otherButtons:nil completion:completion];
+    return [self showActionSheetWithTitle:title message:nil cancel:cancel confirm:confirm destroy:nil otherButtons:nil onView:aView completion:completion];
+}
+
++ (UIAlertController *)showActionSheetWithTitle:(NSString *)title cancel:(NSString *)cancel destroy:(NSString *)destroy completion:(void (^)(NSInteger))completion
+{
+    return [self showActionSheetWithTitle:title cancel:cancel destroy:destroy onView:nil completion:completion];
+}
+
++ (UIAlertController *)showActionSheetWithTitle:(NSString *)title cancel:(NSString *)cancel destroy:(NSString *)destroy onView:(UIView *)aView completion:(void (^)(NSInteger))completion
+{
+    return [self showActionSheetWithTitle:title message:nil cancel:cancel confirm:nil destroy:destroy otherButtons:nil onView:aView completion:completion];
 }
 
 + (UIAlertController *)showActionSheetWith:(NSDictionary *)alertInfo completion:(void (^)(NSInteger selectIndex))completion
 {
-    return [self showAlertWithInfo:alertInfo style:UIAlertControllerStyleActionSheet completion:completion];
+    return [self showActionSheetWith:alertInfo onView:nil completion:completion];
 }
 
-+ (UIAlertController *)showActionSheetWithTitle:(NSString *)title message:(NSString *)message cancel:(NSString *)cancel confirm:(NSString *)confirm destroy:(NSString *)destroy otherButtons:(NSArray *)arrBtns completion:(void (^)(NSInteger))completion
++ (UIAlertController *)showActionSheetWith:(NSDictionary *)alertInfo onView:(UIView *)aView completion:(void (^)(NSInteger))completion
 {
-    return [self showAlertWithTitle:title message:message cancel:cancel confirm:confirm destroy:destroy otherButtons:arrBtns style:UIAlertControllerStyleActionSheet completion:completion];
+    UIAlertController *aVC = [self showAlertWithInfo:alertInfo style:UIAlertControllerStyleActionSheet completion:completion];
+    [self configPresentationOfActionSheet:aVC WithView:aView];
+    return aVC;
+}
+
++ (UIAlertController *)showActionSheetWithTitle:(NSString *)title cancel:(NSString *)cancel confirm:(NSString *)confirm otherButtons:(NSArray *)arrBtns completion:(void (^)(NSInteger))completion
+{
+    return [self showActionSheetWithTitle:title cancel:cancel confirm:confirm otherButtons:arrBtns onView:nil completion:completion];
+}
+
++ (UIAlertController *)showActionSheetWithTitle:(NSString *)title cancel:(NSString *)cancel confirm:(NSString *)confirm otherButtons:(NSArray *)arrBtns onView:(UIView *)aView completion:(void (^)(NSInteger))completion
+{
+    return [self showActionSheetWithTitle:title message:nil cancel:cancel confirm:confirm destroy:nil otherButtons:arrBtns onView:aView completion:completion];
+}
+
++ (UIAlertController *)showActionSheetWithTitle:(NSString *)title message:(NSString *)message cancel:(NSString *)cancel confirm:(NSString *)confirm destroy:(NSString *)destroy otherButtons:(NSArray *)arrBtns onView:(UIView *)aView completion:(void (^)(NSInteger))completion
+{
+    UIAlertController *aVC = [self showAlertWithTitle:title message:message cancel:cancel confirm:confirm destroy:destroy otherButtons:arrBtns style:UIAlertControllerStyleActionSheet completion:completion];
+    [self configPresentationOfActionSheet:aVC WithView:aView];
+    return aVC;
+}
+
++ (UIAlertController *)configPresentationOfActionSheet:(UIAlertController *)aVC WithView:(UIView *)aView
+{
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        CGRect rect = CGRectZero;
+        if (aView == nil) {
+            id<UIApplicationDelegate> delegate = [UIApplication sharedApplication].delegate;
+            aView = [delegate window];
+            rect = aView.bounds;
+            rect.origin.y = rect.size.height;
+        } else {
+            [aView.superview convertRect:aView.frame toCoordinateSpace:aView.window];
+        }
+        aVC.popoverPresentationController.sourceView = aView;
+        aVC.popoverPresentationController.sourceRect = rect;
+    }
+    return aVC;
 }
 
 
@@ -303,6 +344,11 @@ static BOOL s_alertWindowInShow = NO;
         [alertVC addAction:[MJAlertAction actionWithTitle:cancel style:(UIAlertActionStyleCancel) handler:^(UIAlertAction * _Nonnull action) {
             alertClick(0);
         }]];
+    } else if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad && style == UIAlertControllerStyleActionSheet) {
+        // iPad 必须有取消，不然点击其他位置ActionSheet消失但Window没消失
+        [alertVC addAction:[MJAlertAction actionWithTitle:locString(@"Cancel") style:(UIAlertActionStyleCancel) handler:^(UIAlertAction * _Nonnull action) {
+            alertClick(0);
+        }]];
     }
     
     // 确定
@@ -331,6 +377,12 @@ static BOOL s_alertWindowInShow = NO;
         [alertVC addAction:[MJAlertAction actionWithTitle:destroy style:(UIAlertActionStyleDestructive) handler:^(UIAlertAction * _Nonnull action) {
             alertClick(-1);
         }]];
+        // 存在销毁按钮但是没有其他按钮是或导致无法取消，需要加取消按钮
+        if ([alertVC.actions count] <= 1) {
+            [alertVC addAction:[MJAlertAction actionWithTitle:locString(@"Cancel") style:(UIAlertActionStyleCancel) handler:^(UIAlertAction * _Nonnull action) {
+                alertClick(0);
+            }]];
+        }
     }
     
     [self showAlertController:alertVC];
