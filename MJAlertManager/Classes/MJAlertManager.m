@@ -228,10 +228,6 @@ static BOOL s_alertWindowInShow = NO;
 
 + (UIAlertController *)showActionSheetWithTitle:(NSString *)title cancel:(NSString *)cancel confirm:(NSString *)confirm onView:(UIView *)aView completion:(void (^)(NSInteger))completion
 {
-    if (confirm == nil && cancel == nil) {
-        // 确保必须有按钮
-        confirm = locString(@"OK");
-    }
     return [self showActionSheetWithTitle:title message:nil cancel:cancel confirm:confirm destroy:nil otherButtons:nil onView:aView completion:completion];
 }
 
@@ -245,6 +241,16 @@ static BOOL s_alertWindowInShow = NO;
     return [self showActionSheetWithTitle:title message:nil cancel:cancel confirm:nil destroy:destroy otherButtons:nil onView:aView completion:completion];
 }
 
++ (UIAlertController *)showActionSheetWithTitle:(NSString *)title cancel:(NSString *)cancel destroy:(NSString *)destroy otherButtons:(NSArray *)arrBtns completion:(void (^)(NSInteger))completion
+{
+    return [self showActionSheetWithTitle:title cancel:cancel destroy:nil otherButtons:arrBtns onView:nil completion:completion];
+}
+
++ (UIAlertController *)showActionSheetWithTitle:(NSString *)title cancel:(NSString *)cancel destroy:(NSString *)destroy otherButtons:(NSArray *)arrBtns onView:(UIView *)aView completion:(void (^)(NSInteger))completion
+{
+    return [self showActionSheetWithTitle:title message:nil cancel:cancel confirm:nil destroy:destroy otherButtons:arrBtns onView:aView completion:completion];
+}
+
 + (UIAlertController *)showActionSheetWith:(NSDictionary *)alertInfo completion:(void (^)(NSInteger selectIndex))completion
 {
     return [self showActionSheetWith:alertInfo onView:nil completion:completion];
@@ -255,16 +261,6 @@ static BOOL s_alertWindowInShow = NO;
     UIAlertController *aVC = [self showAlertWithInfo:alertInfo style:UIAlertControllerStyleActionSheet completion:completion];
     [self configPresentationOfActionSheet:aVC WithView:aView];
     return aVC;
-}
-
-+ (UIAlertController *)showActionSheetWithTitle:(NSString *)title cancel:(NSString *)cancel confirm:(NSString *)confirm otherButtons:(NSArray *)arrBtns completion:(void (^)(NSInteger))completion
-{
-    return [self showActionSheetWithTitle:title cancel:cancel confirm:confirm otherButtons:arrBtns onView:nil completion:completion];
-}
-
-+ (UIAlertController *)showActionSheetWithTitle:(NSString *)title cancel:(NSString *)cancel confirm:(NSString *)confirm otherButtons:(NSArray *)arrBtns onView:(UIView *)aView completion:(void (^)(NSInteger))completion
-{
-    return [self showActionSheetWithTitle:title message:nil cancel:cancel confirm:confirm destroy:nil otherButtons:arrBtns onView:aView completion:completion];
 }
 
 + (UIAlertController *)showActionSheetWithTitle:(NSString *)title message:(NSString *)message cancel:(NSString *)cancel confirm:(NSString *)confirm destroy:(NSString *)destroy otherButtons:(NSArray *)arrBtns onView:(UIView *)aView completion:(void (^)(NSInteger))completion
@@ -327,7 +323,7 @@ static BOOL s_alertWindowInShow = NO;
 
 + (UIAlertController *)showAlertWithTitle:(NSString *)title message:(NSString *)message cancel:(NSString *)cancel confirm:(NSString *)confirm destroy:(NSString *)destroy otherButtons:(NSArray *)arrBtns style:(UIAlertControllerStyle)style completion:(void (^)(NSInteger))completion
 {
-    if (title.length == 0 && message.length == 0) {
+    if (style == UIAlertControllerStyleAlert && title.length == 0 && message.length == 0) {
         LogError(@"Nothing to show");
         return nil;
     }
