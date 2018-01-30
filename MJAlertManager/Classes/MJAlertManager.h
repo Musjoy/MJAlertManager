@@ -6,6 +6,7 @@
 //  统一管理Alert和ActionSheet弹窗
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @interface MJAlertManager : NSObject
 
