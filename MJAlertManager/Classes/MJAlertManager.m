@@ -279,8 +279,9 @@ static BOOL s_alertWindowInShow = NO;
             aView = [delegate window];
             rect = aView.bounds;
             rect.origin.y = rect.size.height;
+            rect.size.height = 1;
         } else {
-            [aView.superview convertRect:aView.frame toCoordinateSpace:aView.window];
+            rect = aView.bounds;
         }
         aVC.popoverPresentationController.sourceView = aView;
         aVC.popoverPresentationController.sourceRect = rect;
