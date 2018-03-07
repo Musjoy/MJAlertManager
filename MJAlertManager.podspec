@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'MJAlertManager'
-  s.version          = '0.1.9'
+  s.version          = '0.1.10'
   s.summary          = 'A Manager of alert.'
 
   s.homepage         = 'https://github.com/Musjoy/MJAlertManager'
