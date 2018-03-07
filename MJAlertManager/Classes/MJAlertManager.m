@@ -219,6 +219,19 @@ static BOOL s_alertWindowInShow = NO;
     return [self showAlertWithTitle:title message:message cancel:nil confirm:nil completion:NULL];
 }
 
+ + (void)showCustomAlertController:(UIViewController *)aVC
+{
+    [self showAlertController:(UIAlertController *)aVC];
+}
+
++ (void)hideCustomAlertController:(UIViewController *)aVC completion:(void (^)(void))completion
+{
+    [aVC dismissViewControllerAnimated:NO completion:^{
+        [self alertControllerBeenDismissed:(UIAlertController *)aVC];
+        completion ? completion() : 0;
+    }];
+}
+
 #pragma mark - ActionSheet
 
 + (UIAlertController *)showActionSheetWithTitle:(NSString *)title cancel:(NSString *)cancel confirm:(NSString *)confirm completion:(void (^)(NSInteger))completion

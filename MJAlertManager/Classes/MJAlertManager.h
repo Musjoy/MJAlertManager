@@ -63,6 +63,11 @@
 //                              otherButtons:(NSArray *)arrBtns
 //                                completion:(void (^)(NSInteger selectIndex))completion;
 
+/// 显示一个自定义的弹框界面
++ (void)showCustomAlertController:(UIViewController *)aVC;
+/// 隐藏一个自定义的弹框界面
++ (void)hideCustomAlertController:(UIViewController *)aVC completion:(void (^)(void))completion;
+
 #pragma ActionSheet
 // ActionSheet 尽量使用有onView的方法，保证iPad上能正常显示
 
